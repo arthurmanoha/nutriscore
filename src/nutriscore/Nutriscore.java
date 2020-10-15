@@ -13,13 +13,14 @@ public class Nutriscore {
 
         JFrame frame = new JFrame();
 
-        NutriModel model = new NutriModel();
+        NutriModel model = new NutriModel(2);
         MyPanel panel = new MyPanel(model);
 
         frame.setContentPane(panel);
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(MyPanel.defaultWidth, MyPanel.defaultHeight);
+        frame.addKeyListener(new MyKeyListener(model));
         frame.setVisible(true);
 
     }
