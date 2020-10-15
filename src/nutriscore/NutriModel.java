@@ -21,7 +21,7 @@ public class NutriModel extends Observable {
 
     private ArrayList<Observer> observers;
 
-    private long updatePeriod = 1000;
+    private long updatePeriod = 8000;
 
     /**
      * Constructor with a given score.
@@ -49,6 +49,22 @@ public class NutriModel extends Observable {
     }
 
     /**
+     * Change the nutriscore by adding or removing one.
+     *
+     * @param mustIncrease if true, add one; else, remove one.
+     */
+    public void increaseValue(boolean mustIncrease) {
+        if (mustIncrease) {
+            this.nutriscore++;
+        } else {
+            this.nutriscore--;
+        }
+        // Keep the nutriscore between 0 and max.
+        nutriscore = Math.max(0, Math.min(MAX_SCORE, nutriscore));
+        notifyObservers();
+    }
+
+    /**
      * Set the score to a given value.
      *
      * @param newVal the new score.
@@ -65,11 +81,18 @@ public class NutriModel extends Observable {
 
     /**
      * Add an observer
+     *
+     * @param o
      */
     public void registerObserver(Observer o) {
         observers.add(o);
     }
 
+    /**
+     * Remove an observer
+     *
+     * @param o
+     */
     public void unregisterObserver(Observer o) {
         observers.remove(o);
     }
@@ -83,6 +106,9 @@ public class NutriModel extends Observable {
         }
     }
 
+    /**
+     * This task generates a random number and sets the model
+     */
     private static class MyTask extends TimerTask {
 
         private NutriModel model;
@@ -93,7 +119,7 @@ public class NutriModel extends Observable {
 
         @Override
         public void run() {
-            int val = new Random().nextInt(MAX_SCORE + 2);
+            int val = new Random().nextInt(MAX_SCORE + 1);
             System.out.println("Timer task generated value " + val);
             try {
                 model.setValue(val);
