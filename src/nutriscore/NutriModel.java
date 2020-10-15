@@ -1,9 +1,14 @@
 package nutriscore;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
@@ -21,7 +26,7 @@ public class NutriModel extends Observable {
 
     private ArrayList<Observer> observers;
 
-    private long updatePeriod = 8000;
+    private long updatePeriod = 10000;
 
     /**
      * Constructor with a given score.
@@ -112,20 +117,63 @@ public class NutriModel extends Observable {
     private static class MyTask extends TimerTask {
 
         private NutriModel model;
+        private URL url;
 
         public MyTask(NutriModel modelParam) {
             model = modelParam;
+            try {
+                url = new URL("https://www.random.org/integers/?num=1&min=0&max="
+                        + MAX_SCORE
+                        + "&col=1&base=10&format=plain&rnd=new");
+
+            } catch (MalformedURLException e) {
+                System.out.println("Malformed URL at task creation");
+            }
         }
 
         @Override
         public void run() {
-            int val = new Random().nextInt(MAX_SCORE + 1);
-            System.out.println("Timer task generated value " + val);
+            int valFromServer = performSingleRequest();
             try {
-                model.setValue(val);
+                model.setValue(valFromServer);
             } catch (IncorrectScoreException ex) {
                 Logger.getLogger(NutriModel.class.getName()).log(Level.SEVERE, null, ex);
             }
+        }
+
+        /**
+         * Request a value from the given URL and return it as an integer.
+         *
+         * @return a random integer obtained from the URL, or -1 in case of an
+         * error.
+         */
+        private int performSingleRequest() {
+
+            int result = -1;
+
+            try {
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
+                conn.setRequestProperty("Accept", "application/json");
+
+                if (conn.getResponseCode() != 200) {
+                    throw new RuntimeException("Failed : HTTP error code : "
+                            + conn.getResponseCode());
+                }
+
+                BufferedReader br = new BufferedReader(new InputStreamReader(
+                        (conn.getInputStream())));
+
+                String output;
+                while ((output = br.readLine()) != null) {
+                    result = Integer.parseInt(output);
+                }
+
+                conn.disconnect();
+            } catch (IOException e) {
+                System.out.println("IO exception");
+            }
+            return result;
         }
     }
 }
