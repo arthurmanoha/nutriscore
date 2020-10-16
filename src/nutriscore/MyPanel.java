@@ -13,7 +13,7 @@ import javax.swing.JPanel;
  */
 public class MyPanel extends JPanel implements Observer {
 
-    public static final int defaultHeight = 400;
+    public static final int defaultHeight = 600;
     public static final int defaultWidth = 800;
 
     // Distance between the colored boxes and the frame limit

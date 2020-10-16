@@ -38,7 +38,7 @@ public class NutriModel extends Observable {
         this.observers = new ArrayList<>();
 
         Timer timer = new Timer();
-        timer.schedule(new MyTask(this), updatePeriod, updatePeriod);
+        timer.schedule(new MyTask(this), 0, updatePeriod);
     }
 
     /**
