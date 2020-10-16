@@ -10,13 +10,13 @@ else
 fi
 
 # Compile
-javac src/nutriscore/*.java
+javac src/nutriscore/*.java -d classes/nutriscore/
 
 # Set the classpath - failed
 # java -classpath src/nutriscore/Nutriscore
 
 # Prepare the JAR
-echo Main-Class: nutriscore.Nutriscore> manifest.mf
+echo Main-Class: Nutriscore > classes/manifest.txt
 jar cfm Nutriscore.jar MANIFEST.MF -C src/nutriscore/
 chmod +x Nutriscore.jar
 
